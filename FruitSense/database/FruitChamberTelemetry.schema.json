@@ -1,0 +1,49 @@
+{
+  "service": "AWS DynamoDB",
+  "region": "ap-southeast-1",
+  "table": "FruitChamberTelemetry",
+  "description": "Stores sensor telemetry reported by the ESP32 through AWS IoT Core. Written by an IoT Rule; read by the FruitChamberAPI Lambda on behalf of the React app.",
+  "partitionKey": {
+  "name": "deviceId",
+    "type": "String",
+    "example": "chamber01"
+  },
+  "sortKey": {
+    "name": "timestamp",
+    "type": "Number",
+    "value": "epoch milliseconds",
+    "example": 1788500000000
+  },
+  "keySchema": [
+    { "AttributeName": "deviceId", "KeyType": "HASH" },
+    { "AttributeName": "timestamp", "KeyType": "RANGE" }
+  ],
+  "attributeDefinitions": [
+    { "AttributeName": "deviceId", "AttributeType": "S" },
+    { "AttributeName": "timestamp", "AttributeType": "N" }
+  ],
+  "billingMode": "PAY_PER_REQUEST",
+  "globalSecondaryIndexes": [],
+  "localSecondaryIndexes": [],
+  "timeToLiveSpecification": {
+    "enabled": true,
+    "attributeName": "ttl"
+  },
+  "attributes": {
+    "deviceId": { "type": "String", "required": true, "example": "chamber01" },
+    "timestamp": { "type": "Number", "required": true, "example": 1788500000000 },
+    "temperature": { "type": "Number", "unit": "deg C", "example": 28.4 },
+    "humidity": { "type": "Number", "unit": "percent", "example": 82.1 },
+    "dht_valid": { "type": "Boolean", "example": true },
+    "mq3_raw": { "type": "Number", "example": 1234 },
+    "mq3_filtered": { "type": "Number", "example": 1200 },
+    "mq3_ppm": { "type": "Number", "example": 0 },
+    "mq3_voltage": { "type": "Number", "unit": "V", "example": 1.8 },
+    "mq3_rs": { "type": "Number", "example": 15.2 },
+    "mq3_ro": { "type": "Number", "example": 0 },
+    "mq3_calibrated": { "type": "Boolean", "example": false },
+    "mq3_warmed_up": { "type": "Boolean", "example": true },
+    "ttl": { "type": "Number", "optional": true, "example": 1788503600 }
+  },
+  "note": "The React app never touches DynamoDB directly. It reads this table via API Gateway -> Lambda (GET /chamber/latest, GET /chamber/history)."
+}

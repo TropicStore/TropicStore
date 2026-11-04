@@ -1,0 +1,34 @@
+{
+  "service": "AWS DynamoDB",
+  "region": "ap-southeast-1",
+  "table": "FruitSense-Users",
+  "description": "Stores user accounts for the FruitSense app. Written and read only by the AuthLambda via API Gateway. Passwords are stored as PBKDF2-HMAC-SHA256 hashes - never plaintext.",
+  "partitionKey": {
+    "name": "email",
+    "type": "String",
+    "note": "lowercased user email; also used as the user uid in the app",
+    "example": "grower@example.com"
+  },
+  "sortKey": null,
+  "keySchema": [
+    { "AttributeName": "email", "KeyType": "HASH" }
+  ],
+  "attributeDefinitions": [
+    { "AttributeName": "email", "AttributeType": "S" }
+  ],
+  "billingMode": "PAY_PER_REQUEST",
+  "globalSecondaryIndexes": [],
+  "localSecondaryIndexes": [],
+  "attributes": {
+    "email": { "type": "String", "required": true, "example": "grower@example.com" },
+    "password_hash": { "type": "String", "required": true, "note": "base64 PBKDF2-HMAC-SHA256 derived key" },
+    "password_salt": { "type": "String", "required": true, "note": "base64 random 16-byte salt" },
+    "password_iterations": { "type": "Number", "required": true, "example": 180000 },
+    "display_name": { "type": "String", "required": false, "example": "Grower Joe" },
+    "phone_number": { "type": "String", "optional": true },
+    "photo_url": { "type": "String", "optional": true },
+    "created_at": { "type": "String", "required": true, "note": "ISO 8601 timestamp", "example": "2026-09-06T00:00:00Z" },
+    "updated_at": { "type": "String", "required": true, "note": "ISO 8601 timestamp" }
+  },
+  "note": "Authentication tokens are not stored in DynamoDB - they are signed HMAC-SHA256 tokens verified by the AuthLambda using the AUTH_TOKEN_SECRET environment variable. The mobile app only holds the token and sends it in the Authorization: Bearer header."
+}
